@@ -1,0 +1,3431 @@
+openapi: 3.0.0
+x-stoplight:
+  id: v0r49t68fw391
+info:
+  title: Main Document
+  version: '1.0'
+  description: API for creating and updating information about accounts
+  license:
+    name: TBD
+servers:
+  - url: 'http://localhost:3000/v1'
+paths:
+  /login:
+    parameters: []
+    post:
+      summary: login
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/beneficiary'
+              examples:
+                Example 1:
+                  value:
+                    beneficiaryId: "{{$guid}}"
+                    firstName: "{{$randomFirstName}}"
+                    middleName: "{{$randomLastName}}"
+                    lastName: "{{$randomLastName}}"
+                    birthdate: "{{$isoTimestamp}}"
+                    phoneNumber: "{{$randomPhoneNumber}}"
+                    gender: male
+                    familyMembers:
+                      - familyMemberId: "{{$guid}}"
+                        firstName: "{{$randomFirstName}}"
+                        middleName: "{{$randomLastName}}"
+                        lastName: "{{$randomLastName}}"
+                        birthdate: "{{$isoTimestamp}}"
+                        relationshipToBeneficiary: Father
+                        gender: male
+                    insurancePolicyId: "{{$guid}}"
+                    cityResidence: "{{$randomCity}}"
+                    districtResidence: "{{$randomStreetName}}"
+                    account:
+                      hasAccount: false
+                      userId: "{{$guid}}"
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+            examples:
+              Example 1:
+                value:
+                  username: user name
+                  password: password hash
+      description: user login
+      parameters: []
+  /logout:
+    parameters: []
+    post:
+      summary: logout
+      operationId: post-logout
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+      description: user logout
+  /users:
+    get:
+      summary: List all users
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/user'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+              examples:
+                Example 1:
+                  value:
+                    object:
+                      - userId: "{{$guid}}"
+                        username: "{{$randomDomainWord}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        phoneAuthenticated: false
+                        whatsAppNumber: "+{{$randomPhoneNumber}}"
+                        beneficiary:
+                          hasBeneficiary: true
+                          benefciaryId: "{{$guid}}"
+                      - userId: "{{$guid}}"
+                        username: "{{$randomDomainWord}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        phoneAuthenticated: true
+                        whatsAppNumber: "+{{$randomPhoneNumber}}"
+                        beneficiary:
+                          hasBeneficiary:  true
+                          benefciaryId: beneficiary ID
+                      - userId: "{{$guid}}"
+                        username: "{{$randomDomainWord}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        phoneAuthenticated:  true
+                        whatsAppNumber: "+{{$randomPhoneNumber}}"
+                        beneficiary:
+                          hasBeneficiary: true
+                          benefciaryId: "{{$guid}}"
+                    objectCount: 3
+                    hasMore: false
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: get-users
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+    post:
+      summary: Create a new user
+      tags: []
+      operationId: post-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-new'
+      description: ''
+  '/users/{username}':
+    get:
+      summary: Get user information
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+              examples:
+                Example 1:
+                  value:
+                    userId: "{{$guid}}"
+                    username: "{{$randomDomainWord}}"
+                    phoneNumber: "{{$randomPhoneNumber}}"
+                    phoneAuthenticated: true
+                    whatsAppNumber: "+{{$randomPhoneNumber}}"
+                    beneficiary:
+                      hasBeneficiary: true
+                      benefciaryId: "{{$guid}}"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: get-users-username
+      parameters: []
+    parameters:
+      - schema:
+          type: string
+        name: username
+        in: path
+        required: true
+  /beneficiaries:
+    get:
+      summary: List all beneficiaries
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/beneficiary'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+              examples:
+                Example 1:
+                  value:
+                    object:
+                      - beneficiaryId: "{{$guid}}"
+                        firstName: "{{$randomFirstName}}"
+                        middleName: "{{$randomLastName}}"
+                        lastName: "{{$randomLastName}}"
+                        birthdate: "{{$isoTimestamp}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        gender: "male"
+                        familyMembers:
+                          - familyMemberId: "{{$guid}}"
+                            firstName: "{{$randomFirstName}}"
+                            middleName: "{{$randomLastName}}"
+                            lastName: "{{$randomLastName}}"
+                            birthdate: "{{$isoTimestamp}}"
+                            relationshipToBeneficiary: Father
+                            gender: "male"
+                          - familyMemberId: "{{$guid}}"
+                            firstName: "{{$randomFirstName}}"
+                            middleName: "{{$randomLastName}}"
+                            lastName: "{{$randomLastName}}"
+                            birthdate: "{{$isoTimestamp}}"
+                            relationshipToBeneficiary: Mother
+                            gender: female
+                          - familyMemberId: "{{$guid}}"
+                            firstName: "{{$randomFirstName}}"
+                            middleName: "{{$randomLastName}}"
+                            lastName: "{{$randomLastName}}"
+                            birthdate: "{{$randomLastName}}"
+                            relationshipToBeneficiary: Brother
+                            gender: "male"
+                        insurancePolicyId: "{{$guid}}"
+                        cityResidence: "{{$randomCity}}"
+                        districtResidence: "{{$randomStreetName}}"
+                        account:
+                          hasAccount: true
+                          userId: "{{$guid}}"
+                      - beneficiaryId: "{{$guid}}"
+                        firstName: "{{$randomFirstName}}"
+                        middleName: "{{$randomLastName}}"
+                        lastName: "{{$randomLastName}}"
+                        birthdate: "{{$isoTimestamp}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        gender: "male"
+                        familyMembers:
+                          - familyMemberId: "{{$guid}}"
+                            firstName: "{{$randomFirstName}}"
+                            middleName: "{{$randomLastName}}"
+                            lastName: "{{$randomLastName}}"
+                            birthdate: "{{$isoTimestamp}}"
+                            relationshipToBeneficiary: Mother
+                            gender: "female"
+                        insurancePolicyId: "{{$guid}}"
+                        cityResidence: "{{$randomCity}}"
+                        districtResidence: "{{$randomStreetName}}"
+                        account:
+                          hasAccount: true
+                          userId: "{{$guid}}"
+                      - beneficiaryId: "{{$guid}}"
+                        firstName: "{{$randomFirstName}}"
+                        middleName: "{{$randomLastName}}"
+                        lastName: "{{$randomLastName}}"
+                        birthdate: "{{$isoTimestamp}}"
+                        phoneNumber: "{{$randomPhoneNumber}}"
+                        gender: "male"
+                        familyMembers:
+                          - familyMemberId: "{{$guid}}"
+                            firstName: "{{$randomFirstName}}"
+                            middleName: "{{$randomLastName}}"
+                            lastName: "{{$randomLastName}}"
+                            birthdate: "{{$isoTimestamp}}"
+                            relationshipToBeneficiary: Sister
+                            gender: "female"
+                        insurancePolicyId: "{{$guid}}"
+                        cityResidence: "{{$randomCity}}"
+                        districtResidence: "{{$randomStreetName}}"
+                        account:
+                          hasAccount: true
+                          userId: "{{$guid}}"
+                    objectCount: 3
+                    hasMore: false
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - schema:
+            type: string
+          in: query
+          name: insurancePolicyId
+          description: A string used to retrieve beneficiaries associated with the indicated insurance policy by providing the insurance policy ID
+    post:
+      summary: Create a new beneficiary
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/beneficiary'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-beneficiaries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/beneficiary-new'
+    parameters: []
+  '/beneficiaries/{beneficiaryId}':
+    get:
+      summary: Get beneficiary Information by ID
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/beneficiary'
+              examples: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-beneficiaryId
+      description: Get information about the user
+      parameters: []
+    parameters:
+      - schema:
+          type: string
+        name: beneficiaryId
+        in: path
+        required: true
+    patch:
+      summary: ''
+      operationId: patch-users-userId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/beneficiary'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/beneficiary-update'
+            examples:
+              Example 1:
+                value:
+                  firstName: "{{$randomFirstName}}"
+                  middleName: "{{$randomLastName}}"
+                  lastName: "{{$randomLastName}}"
+                  birthdate: "{{$isoTimestamp}}"
+                  phoneNumber: "{{$randomPhoneNumber}}"
+                  gender: "male"
+                  familyMembers:
+                    - familyMemberId: "{{$guid}}"
+                      firstName: "{{$randomFirstName}}"
+                      middleName: "{{$randomLastName}}"
+                      lastName: "{{$randomLastName}}"
+                      birthdate: "{{$isoTimestamp}}"
+                      relationshipToBeneficiary: Father
+                      gender: "male"
+                    - familyMemberId: "{{$guid}}"
+                      firstName: "{{$randomFirstName}}"
+                      middleName: "{{$randomLastName}}"
+                      lastName: "{{$randomLastName}}"
+                      birthdate: "{{$isoTimestamp}}"
+                      relationshipToBeneficiary: Mother
+                      gender: "female"
+                  insurancePolicyId: "{{$guid}}"
+                  residentCity: "{{$randomCity}}"
+                  residentDistrict: "{{$randomStreetName}}"
+                  account:
+                    hasAccount: true
+                    userId: "{{$guid}}"
+  '/beneficiaries/{benefciaryId}/expenseReports':
+    parameters:
+      - schema:
+          type: string
+        name: benefciaryId
+        in: path
+        required: true
+    get:
+      summary: Get expense reports
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/expenseReport'
+                  ObjectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - ObjectCount
+                  - hasMore
+              examples:
+                Example 1:
+                  value:
+                    object:
+                      - ExepnseReportId: "{{$guid}}"
+                        healtcareCenterId: "{{$guid}}"
+                        healtcareCenterName: "{{$randomCompanyName}}"
+                        serviceDate: "{{$isoTimestamp}}"
+                        charnge: {{$randomInt}}
+                        currency: "{{$randomCurrencyCode}}"
+                        beneficiaryId: "{{$guid}}"
+                        patientName: "{{$randomFirstName}}"
+                    ObjectCount: 0
+                    hasMore: true
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-benefciaryId-expenseReports
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+    post:
+      summary: Add expense report
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/expenseReport'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-beneficiaries-benefciaryId-expenseReport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/expenseReport-new'
+            examples:
+              Example 1:
+                value:
+                  healtcareCenterId: "{{$guid}}"
+                  healtcareCenterName: "{{$randomCompanyName}}"
+                  serviceDate: "{{$isoTimestamp}}"
+                  charnge: {{$randomInt}}
+                  currency: "{{$randomCurrencyCode}}"
+                  beneficiaryId: "{{$guid}}"
+                  patientName: "{{$randomFirstName}}"
+  '/beneficiaries/{benefciaryId}/medicalFiles':
+    parameters:
+      - schema:
+          type: string
+        name: benefciaryId
+        in: path
+        required: true
+    get:
+      summary: Get medical files
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/medicalFile'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-benefciaryId-medicalFiles
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+  /beneficiaries/claims:
+    parameters: []
+    get:
+      summary: Get all claims from all beneficiary
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/manualClaims'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - Object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-claims
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+      description: ''
+  '/beneficiaries/{benefciaryId}/claims':
+    parameters:
+      - schema:
+          type: string
+        name: benefciaryId
+        in: path
+        required: true
+    get:
+      summary: Get all claims from beneficiary
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/manualClaims'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-benefciaryId-claims
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+    post:
+      summary: submit a claim
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/manualClaims'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-beneficiaries-benefciaryId-claims
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/manualClaims-new'
+  '/beneficiaries/{benefciaryId}/benefitPolicies':
+    parameters:
+      - schema:
+          type: string
+        name: benefciaryId
+        in: path
+        required: true
+    get:
+      summary: Get benefit policy information
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/insurancePolicy'
+              examples: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-beneficiaries-benefciaryId-benefitPolicies
+  /appointments:
+    get:
+      summary: List all appointments
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/appointments'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-appointments
+      parameters:
+        - $ref: '#/components/parameters/pending'
+        - $ref: '#/components/parameters/booked'
+        - $ref: '#/components/parameters/completed'
+        - $ref: '#/components/parameters/cancelled'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - $ref: '#/components/parameters/fromDate'
+        - $ref: '#/components/parameters/toDate'
+        - $ref: '#/components/parameters/rejected'
+        - $ref: '#/components/parameters/medicalCenterId'
+  '/appointments/{appointmentId}':
+    parameters:
+      - schema:
+          type: string
+        name: appointmentId
+        in: path
+        required: true
+    patch:
+      summary: update appointment
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appointments'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: patch-appointments-appointmentId
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                appointmentStatus:
+                  type: string
+              required:
+                - appointmentStatus
+  '/appointments/users/{userId}':
+    post:
+      summary: request an appointment
+      operationId: post-appointments
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/appointments'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduleId:
+                  type: string
+                medicalCenterId:
+                  type: string
+                doctorId:
+                  type: string
+                priceId:
+                  type: string
+                patient:
+                  $ref: '#/components/schemas/patient'
+                notes:
+                  type: string
+                images:
+                  type: string
+              required:
+                - scheduleId
+                - medicalCenterId
+                - doctorId
+                - priceId
+                - patient
+        description: ''
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: List all appointments for user
+      operationId: get-appointments-users-userId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/appointments'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      parameters:
+        - $ref: '#/components/parameters/booked'
+        - $ref: '#/components/parameters/pending'
+        - $ref: '#/components/parameters/completed'
+        - $ref: '#/components/parameters/cancelled'
+        - $ref: '#/components/parameters/rejected'
+      x-internal: false
+      description: ''
+  /medicalCenters:
+    get:
+      summary: List medical
+      tags: []
+      operationId: get-medicalCenters
+      description: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/medicalCenter'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                    description: Indication if there are more objects to retreive
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+              examples: {}
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - $ref: '#/components/parameters/city'
+    parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 30'
+      - name: starting_after_object
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.'
+    post:
+      summary: create a medical center
+      operationId: post-medicalCenters
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/medicalCenter'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/medicalCenter-new'
+  '/medicalCenters/{medicalCenterId}':
+    parameters:
+      - schema:
+          type: string
+        name: medicalCenterId
+        in: path
+        required: true
+    get:
+      summary: Get medical center
+      operationId: get-medicalCenters-medicalCenterId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/medicalCenter'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    patch:
+      summary: Get medical center object
+      operationId: patch-medicalCenters-medicalCenterId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/medicalCenter'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/medicalCenter-update'
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/medicalCenter'
+        description: ''
+    delete:
+      summary: ''
+      operationId: delete-medicalCenters-medicalCenterId
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /medicalCenters/claims:
+    get:
+      summary: Get all claims from medical centers
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/medicalCenterClaims'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                  PendingClaimsCount:
+                    type: integer
+                  ApprovedClaimsCount:
+                    type: integer
+                  rejectedClaimsCount:
+                    type: integer
+                  revisedClaimsCount:
+                    type: integer
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+                  - PendingClaimsCount
+                  - ApprovedClaimsCount
+                  - rejectedClaimsCount
+                  - revisedClaimsCount
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-medicalCenters-claims
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - $ref: '#/components/parameters/medicalCenterId'
+        - $ref: '#/components/parameters/institutionId'
+        - schema:
+            type: boolean
+          in: query
+          name: approvedClaims
+          description: get approved claims
+        - schema:
+            type: boolean
+          in: query
+          name: pendingClaims
+          description: get pending claims
+        - schema:
+            type: boolean
+          in: query
+          name: rejectedClaims
+          description: get rejected claims
+        - schema:
+            type: boolean
+          in: query
+          name: revisedClaims
+          description: get revised claims
+        - schema:
+            type: string
+          in: query
+          name: fromDate
+        - schema:
+            type: string
+          in: query
+          name: toDate
+  '/medicalCenters/claims/{claimId}':
+    parameters:
+      - schema:
+          type: string
+        name: claimId
+        in: path
+        required: true
+    patch:
+      summary: Update claim information
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/medicalCenterClaims'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: patch-medicalCenters-claims-claimId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/medicalCenterClaims-update'
+  /schedules:
+    get:
+      summary: List schedules
+      tags: []
+      operationId: get-schedules
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: city
+          required: true
+        - $ref: '#/components/parameters/specialty'
+        - schema:
+            type: string
+          in: query
+          name: timeSlot
+        - schema:
+            type: string
+          in: query
+          name: fromDate
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: toDate
+          required: true
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/medicalCenterId'
+        - $ref: '#/components/parameters/sortBy'
+      description: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/schedule'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    parameters: []
+    post:
+      summary: Create a new schedule
+      operationId: post-schedules
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schedule'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedule-new'
+            examples: {}
+      parameters: []
+  /schedules/scheduleId:
+    patch:
+      summary: Update schedule
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schedule'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: patch-schedules-scheduleId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedule-update'
+    get:
+      summary: Get schedule by ID
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schedule'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-schedules-scheduleId
+      parameters: []
+    delete:
+      summary: Delete schedule
+      tags: []
+      operationId: delete-schedules-scheduleId
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /doctors:
+    post:
+      summary: Create a new doctor
+      tags: []
+      operationId: post-doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/doctor-new'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/doctor'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+    get:
+      summary: List doctors
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/doctor'
+                  objectCount:
+                    type: integer
+                  hasMore:
+                    type: boolean
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-doctors
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+        - $ref: '#/components/parameters/specialty'
+  '/doctors/{doctorId}':
+    get:
+      summary: Get doctor by ID
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/doctor'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-doctors-doctorId
+      parameters: []
+    parameters:
+      - schema:
+          type: string
+        name: doctorId
+        in: path
+        required: true
+    patch:
+      summary: ''
+      operationId: patch-doctors-doctorId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/doctor'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/doctor-update'
+    delete:
+      summary: ''
+      operationId: delete-doctors-doctorId
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  /cities:
+    get:
+      summary: List cities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cityName:
+                    type: array
+                    items:
+                      type: string
+                      example: "{{$randomCity}}"
+                required:
+                  - cityName
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-cities
+    post:
+      summary: Add a city
+      operationId: post-cities
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cityName:
+                    type: string
+                    example: "{{$randomCity}}"
+                required:
+                  - cityName
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cityName:
+                  type: string
+              required:
+                - cityName
+  /medicalSpecialties:
+    get:
+      summary: List medical specialties
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  medicalSpecialty:
+                    type: array
+                    items:
+                      type: string
+                      example: "{{$randomLoremWords}}"
+                required:
+                  - medicalSpecialty
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-medicalSpecialties
+    post:
+      summary: Add a medical specialty
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  specialtyName:
+                    type: string
+                    example: "{{$randomLoremWords}}"
+                required:
+                  - specialtyName
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-medicalSpecialties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                specialtyName:
+                  type: string
+              required:
+                - specialtyName
+    parameters: []
+  /medicalServices:
+    get:
+      summary: Get medical Services
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        serviceId:
+                          type: string
+                          example: "{{$guid}}"
+                        serviceName:
+                          type: string
+                          example: "{{$randomLoremWords}}"
+                  objectCount:
+                    type: integer
+                    example: {{$randomInt}}
+                  hasMore:
+                    type: boolean
+                    example: false
+                required:
+                  - object
+                  - objectCount
+                  - hasMore
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-medicalServices
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+      description: ''
+    post:
+      summary: Add medical service
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  serviceName:
+                    type: string
+                    example: "{{$randomLoremWords}}"
+                required:
+                  - serviceName
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-medicalServices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceName:
+                  type: string
+              required:
+                - serviceName
+  /institutions:
+    get:
+      summary: Get all institution
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-institutions
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/starting_after_object'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                object:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/institutions'
+                objectCounts:
+                  type: integer
+                hasMore:
+                  type: boolean
+              required:
+                - object
+                - objectCounts
+                - hasMore
+    post:
+      summary: Create an institution
+      tags: []
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/institutions'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-institutions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/institutions-new'
+  '/institutions/{institutionId}':
+    parameters:
+      - schema:
+          type: string
+        name: institutionId
+        in: path
+        required: true
+    patch:
+      summary: Update institution
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/institutions'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: patch-institutions-institutionId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/institutions-update'
+    get:
+      summary: ''
+      operationId: get-institutions-institutionId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/institutions'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    user:
+      title: user
+      type: object
+      x-examples:
+        Example 1:
+          userId: "{{$guid}}"
+          username: "{{$randomUserName}}"
+          phoneNumber: "{{$randomPhoneNumber}}"
+          phoneAuthenticated: true
+          whatsAppNumber: "+{{$randomPhoneNumber}}"
+          beneficiary:
+            hasBeneficiary: true
+            benefciaryId: "{{$guid}}"
+      x-internal: false
+      properties:
+        userId:
+          type: string
+          example: "{{$guid}}"
+        username:
+          type: string
+          example: "{{$randomUserName}}"
+        phoneNumber:
+          type: string
+          example: "{{$randomPhoneNumber}}"
+        phoneAuthenticated:
+          type: boolean
+          example: true
+        whatsAppNumber:
+          type: string
+          example: "+{{$randomPhoneNumber}}"
+        beneficiary:
+          type: object
+          properties:
+            hasBeneficiary:
+              type: boolean
+              example: true
+            benefciaryId:
+              type: string
+              example: "{{$guid}}"
+          required:
+            - hasBeneficiary
+      required:
+        - userId
+        - username
+        - phoneNumber
+    user-new:
+      title: user
+      type: object
+      x-examples: {}
+      properties:
+        username:
+          type: string
+        phoneNumber:
+          type: string
+        phoneAuthenticated:
+          type: boolean
+        whatsAppNumber:
+          type: string
+        beneficiaryId:
+          type: string
+        beneficiary:
+          type: object
+          properties:
+            hasBeneficiary:
+              type: boolean
+            benefciaryId:
+              type: string
+          required:
+            - hasBeneficiary
+      required:
+        - username
+        - phoneNumber
+    user-update:
+      title: user
+      type: object
+      x-examples: {}
+      properties:
+        username:
+          type: string
+        phoneNumber:
+          type: string
+        phoneAuthenticated:
+          type: boolean
+        whatsAppNumber:
+          type: string
+        beneficiaryId:
+          type: string
+        beneficiary:
+          type: object
+          properties:
+            hasBeneficiary:
+              type: boolean
+            benefciaryId:
+              type: string
+    familyMember:
+      title: familyMember
+      example: "{{$guid}}"
+      x-stoplight:
+        id: g38is04qhgnra
+      type: object
+      description: Description of the family members
+      x-examples: {}
+      properties:
+        familyMemberId:
+          type: string
+          example: "{{$guid}}"
+        firstName:
+          type: string
+          example: "{{$randomFirstName}}"
+        middleName:
+          type: string
+          example: "{{$randomLastName}}"
+        lastName:
+          type: string
+          example: "{{$randomLastName}}"
+        birthdate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        relationshipToBeneficiary:
+          type: string
+          enum:
+            - Father
+            - mother
+            - daughter
+            - son
+            - husband
+            - wife
+        gender:
+          type: string
+      required:
+        - familyMemberId
+        - firstName
+        - middleName
+        - lastName
+        - birthdate
+        - relationshipToBeneficiary
+        - gender
+    familyMember-new:
+      title: familyMember
+      x-stoplight:
+        id: g38is04qhgnra
+      type: object
+      description: Description of the family members
+      x-examples: {}
+      properties:
+        FirstName:
+          type: string
+        MiddleName:
+          type: string
+        LastName:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        relationshipToUser:
+          type: string
+        gender:
+          type: string
+      required:
+        - FirstName
+        - MiddleName
+        - LastName
+        - birthdate
+        - relationshipToUser
+        - gender
+    familyMember-update:
+      title: familyMember
+      x-stoplight:
+        id: g38is04qhgnra
+      type: object
+      description: Description of the family members
+      x-examples: {}
+      properties:
+        FirstName:
+          type: string
+        MiddleName:
+          type: string
+        LastName:
+          type: string
+        birthdate:
+          type: string
+          format: date
+        relationshipToUser:
+          type: string
+          enum:
+            - father
+            - mother
+            - son
+            - daughter
+            - husband
+            - wife
+            - user
+        gender:
+          type: string
+    doctor:
+      title: doctor
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      description: Doctor details
+      properties:
+        doctorId:
+          type: string
+          example: "{{$guid}}"
+        firstName:
+          type: string
+          example: "{{$randomFirstName}}"
+        middleName:
+          type: string
+          example: "{{$randomLastName}}"
+        lastName:
+          type: string
+          example: "{{$randomLastName}}"
+        specialty:
+          type: string
+          example: "bypass"
+        level:
+          type: string
+          example: "medium"
+        gender:
+          type: string
+          example: "male"
+        birthdate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+      required:
+        - doctorId
+        - firstName
+        - middleName
+        - lastName
+        - specialty
+        - level
+        - gender
+      x-examples:
+        Example 1:
+          doctorId: "{{$guid}}"
+          firstName: "{{$randomFirstName}}"
+          middleName: "{{$randomLastName}}"
+          lastName: "{{$randomLastName}}"
+          specialty: "bypass"
+          level: "high"
+          gender: "male"
+          birthdate: "{{$isoTimestamp}}"
+    doctor-new:
+      title: doctor
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      description: Doctor details
+      properties:
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        specialty:
+          type: string
+        level:
+          type: string
+        gender:
+          type: string
+        birthdate:
+          type: string
+          format: date
+      required:
+        - firstName
+        - middleName
+        - lastName
+        - specialty
+        - level
+        - gender
+        - birthdate
+    doctor-update:
+      title: doctor
+      x-stoplight:
+        id: anrn7yyud85dh
+      type: object
+      description: Doctor details
+      properties:
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        specialty:
+          type: string
+        level:
+          type: string
+        gender:
+          type: string
+        birthdate:
+          type: string
+          format: date
+    medicalCenter:
+      title: medicalCenter
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        medicalCenterId:
+          type: string
+          example: "{{$guid}}"
+        name:
+          type: string
+          example: "{{$randomCompanyName}}"
+        city:
+          type: string
+          example: "{{$randomCity}}"
+        district:
+          type: string
+          example: "{{$randomStreetName}}"
+        description:
+          type: string
+          example: "{{$randomLoremLines}}"
+        address:
+          type: string
+          example: "{{$randomStreetAddress}}"
+        phoneNumber:
+          type: array
+          items:
+            type: string
+            example: "{{$randomPhoneNumber}}"
+        email:
+          type: string
+          example: "{{$randomEmail}}"
+          format: email
+        facebookLink:
+          type: string
+          example: "{{$randomUrl}}"
+        googleMapLink:
+          type: string
+          example: "{{$randomUrl}}"
+        website:
+          type: string
+          example: "{{$randomUrl}}"
+      required:
+        - medicalCenterId
+        - name
+        - city
+        - district
+        - address
+      x-examples:
+        Example 1:
+          medicalCenterId: string
+          name: string
+          city: string
+          district: string
+          description: string
+          address: string
+          phoneNumber:
+            - string
+          email: user@example.com
+          facebookLink: string
+          googleMapLink: string
+          website: string
+    medicalCenter-new:
+      title: medicalCenter new
+      x-stoplight:
+        id: rb8vssmiibqhe
+      type: object
+      description: ''
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: array
+          items:
+            type: string
+        email:
+          type: string
+          format: email
+        facebookLink:
+          type: string
+        googleMapLink:
+          type: string
+        website:
+          type: string
+      required:
+        - name
+        - city
+        - district
+        - address
+        - phoneNumber
+        - googleMapLink
+    medicalCenter-update:
+      title: medicalCenter new
+      x-stoplight:
+        id: rb8vssmiibqhe
+      type: object
+      description: ''
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: array
+          items:
+            type: string
+        email:
+          type: string
+          format: email
+        facebookLink:
+          type: string
+        googleMapLink:
+          type: string
+        website:
+          type: string
+    schedule:
+      title: schedule
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      x-examples:
+        Example 1:
+          scheduleId: "{{$guid}}"
+          healtcareCenterObject:
+            medicalCenterId: "{{$guid}}"
+            name: "{{$randomCompanyName}}"
+            city: "{{$randomCity}}"
+            district: "{{$randomStreetName}}"
+            description: "{{$randomLoremLines}}"
+            address: "{{$randomStreetAddress}}"
+            phoneNumber: "{{$randomPhoneNumber}}"
+            email: "{{$randomEmail}}"
+            facebookLink: "{{$randomUrl}}"
+            googleMapLink: "{{$randomUrl}}"
+            website: "{{$randomUrl}}"
+          doctorObject:
+            doctorId: "{{$guid}}"
+            firstName: "{{$randomFirstName}}"
+            middleName: "{{$randomLastName}}"
+            lastName: "{{$randomLastName}}"
+            specialty: "bone"
+            level: "medium"
+            gender: "male"
+            birthdate: "{{$isoTimestamp}}"
+          timeslot: "{{$isoTimestamp}}"
+          monday: true
+          tuesday: true
+          wednesday: true
+          thursday: true
+          friday: true
+          saturday: true
+          sunday: false
+          price: {{$randomPrice}}
+      properties:
+        scheduleId:
+          type: string
+          example: "{{$guid}}"
+        healtcareCenterObject:
+          $ref: '#/components/schemas/medicalCenter'
+        doctorObject:
+          $ref: '#/components/schemas/doctor'
+        timeslot:
+          type: string
+          example: "{{$isoTimestamp}}"
+        monday:
+          type: boolean
+          example: true
+        tuesday:
+          type: boolean
+          example: true
+        wednesday:
+          type: boolean
+          example: true
+        thursday:
+          type: boolean
+          example: true
+        friday:
+          type: boolean
+          example: true
+        saturday:
+          type: boolean
+          example: false
+        sunday:
+          type: boolean
+          example: false
+        price:
+          type: integer
+          example: {{$randomPrice}}
+        startDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        endDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        isActive:
+          type: boolean
+          example: true
+      required:
+        - scheduleId
+        - healtcareCenterObject
+        - doctorObject
+        - timeslot
+        - monday
+        - tuesday
+        - wednesday
+        - thursday
+        - friday
+        - saturday
+        - sunday
+        - price
+        - startDate
+        - endDate
+        - isActive
+    schedule-new:
+      title: schedule new
+      x-stoplight:
+        id: ssc22rabi387u
+      type: object
+      properties:
+        medicalCenterId:
+          type: string
+        doctorId:
+          type: string
+        timeslot:
+          type: string
+        monday:
+          type: boolean
+        tuesday:
+          type: boolean
+        wednesday:
+          type: boolean
+        thursday:
+          type: boolean
+        friday:
+          type: boolean
+        saturday:
+          type: boolean
+        sunday:
+          type: boolean
+        price:
+          type: integer
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - medicalCenterId
+        - doctorId
+        - timeslot
+        - monday
+        - tuesday
+        - wednesday
+        - thursday
+        - friday
+        - saturday
+        - sunday
+        - price
+        - startDate
+        - endDate
+    schedule-update:
+      title: schedule update
+      x-stoplight:
+        id: ssc22rabi387u
+      type: object
+      properties:
+        timeslot:
+          type: string
+        monday:
+          type: boolean
+        tuesday:
+          type: boolean
+        wednesday:
+          type: boolean
+        thursday:
+          type: boolean
+        friday:
+          type: boolean
+        saturday:
+          type: boolean
+        sunday:
+          type: boolean
+        price:
+          type: integer
+    patient:
+      title: patient
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      x-examples:
+        example-1:
+          userId: "{{$guid}}"
+          patientId: "{{$guid}}"
+          patientName: "{{$randomFirstName}}"
+          patientRelationship: "married"
+      properties:
+        userId:
+          type: string
+          example: "{{$guid}}"
+        patientType:
+          type: string
+          example: "regular"
+        patientId:
+          type: string
+          example: "{{$guid}}"
+        patientName:
+          type: string
+          example: "{{$randomFirstName}}"
+        patientRelationship:
+          type: string
+          example: "single"
+      required:
+        - userId
+        - patientType
+        - patientId
+        - patientName
+        - patientRelationship
+    appointments:
+      title: appointment
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      x-examples:
+        example-1:
+          id: "{{$guid}}"
+          date: "{{$isoTimestamp}}"
+          appointmentStatus: booked
+          price: "{{$randomInt}}"
+          timeslot: "{{$isoTimestamp}}"
+          patient:
+            userId: "{{$guid}}"
+            patientId: "{{$guid}}"
+            patientName: "{{$randomFirstName}}"
+            patientRelationship: "single"
+          doctor:
+            id: "{{$guid}}"
+            firstName: "{{$randomFirstName}}"
+            lastName: "{{$randomLastName}}"
+            specialty: "{{$randomLoremWords}}"
+            level: "low"
+            gender: "female"
+            dateOfBirth: "{{$isoTimestamp}}"
+          medicalCenter:
+            id: "{{$guid}}"
+            name: "{{$randomCompanyName}}"
+            city: "{{$randomCity}}"
+            district: "{{$randomStreetName}}"
+            description: "{{$randomLoremLines}}"
+            address: "{{$randomStreetAddress}}"
+            phoneNumber: "{{$randomPhoneNumber}}"
+            email: "{{$randomEmail}}"
+            facebookLink: "{{$randomUrl}}"
+            googleMapLink: "{{$randomUrl}}"
+            website: "{{$randomUrl}}"
+      properties:
+        appointmentId:
+          type: string
+          example: "{{$guid}}"
+        scheduleId:
+          type: string
+          example: "{{$guid}}"
+        date:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        appointmentStatus:
+          type: string
+          enum:
+            - booked
+            - pending
+            - cancelled
+            - completed
+        price:
+          type: string
+          example: "{{$randomPrice}}"
+        timeslot:
+          type: string
+          example: "{{$isoTimestamp}}"
+        patient:
+          $ref: '#/components/schemas/patient'
+        doctor:
+          $ref: '#/components/schemas/doctor'
+        medicalCenter:
+          $ref: '#/components/schemas/medicalCenter'
+      required:
+        - appointmentId
+        - scheduleId
+        - date
+        - appointmentStatus
+        - price
+        - timeslot
+        - patient
+        - doctor
+        - medicalCenter
+    beneficiary:
+      title: Beneficiary
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        beneficiaryId:
+          type: string
+          example: "{{$guid}}"
+        firstName:
+          type: string
+          example: "{{$randomFirstName}}"
+        middleName:
+          type: string
+          example: "{{$randomLastName}}"
+        lastName:
+          type: string
+          example: "{{$randomLastName}}"
+        birthdate:
+          type: string
+          example: "{{$isoTimestamp}}"
+        phoneNumber:
+          type: string
+          example: "{{$randomPhoneNumber}}"
+        gender:
+          type: string
+          example: "male"
+        familyMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/familyMember'
+        insurancePolicyId:
+          type: string
+          example: "{{$guid}}"
+        cityResidence:
+          type: string
+          example: "{{$randomCity}}"
+        districtResidence:
+          type: string
+          example: "{{$randomStreetName}}"
+        account:
+          type: object
+          required:
+            - hasAccount
+          properties:
+            hasAccount:
+              type: boolean
+            userId:
+              type: string
+              example: "{{$guid}}"
+      required:
+        - beneficiaryId
+        - firstName
+        - middleName
+        - lastName
+        - birthdate
+        - phoneNumber
+        - gender
+        - familyMembers
+        - cityResidence
+        - account
+      x-examples: {}
+    beneficiary-new:
+      title: Beneficiary new
+      x-stoplight:
+        id: lrv9m16yi62iq
+      type: object
+      properties:
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        birthdate:
+          type: string
+        phoneNumber:
+          type: string
+        gender:
+          type: string
+        familyMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/familyMember-new'
+        insurancePolicyId:
+          type: string
+        residentCity:
+          type: string
+        residentDistrict:
+          type: string
+        account:
+          type: object
+          properties:
+            hasAccount:
+              type: boolean
+            userId:
+              type: string
+          required:
+            - hasAccount
+      required:
+        - firstName
+        - middleName
+        - lastName
+        - birthdate
+        - phoneNumber
+        - gender
+        - familyMembers
+        - insurancePolicyId
+        - residentCity
+    beneficiary-update:
+      title: Beneficiary update
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "{{$randomFirstName}}"
+        middleName:
+          type: string
+          example: "{{$randomLastName}}"
+        lastName:
+          type: string
+          example: "{{$randomLastName}}"
+        birthdate:
+          type: string
+          example: "{{$isoTimestamp}}"
+        phoneNumber:
+          type: string
+          example: "{{$randomPhoneNumber}}"
+        gender:
+          type: string
+          example: "male"
+        familyMembers:
+          type: array
+          items:
+            $ref: '#/components/schemas/familyMember-update'
+        insurancePolicyId:
+          type: string
+          example: "{{$guid}}"
+        residentCity:
+          type: string
+          example: "{{$randomCity}}"
+        residentDistrict:
+          type: string
+          example: "{{$randomStreetName}}"
+        account:
+          type: object
+          properties:
+            hasAccount:
+              type: boolean
+              example: false
+            userId:
+              type: string
+              example: "{{$guid}}"
+    expenseReport:
+      title: Expense report
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        ExepnseReportId:
+          type: string
+          example: "{{$guid}}"
+        healtcareCenterId:
+          type: string
+          example: "{{$guid}}"
+        healtcareCenterName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        serviceDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        charnge:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        currency:
+          type: string
+          example: "{{$randomCurrencyCode}}"
+        beneficiaryId:
+          type: string
+          example: "{{$guid}}"
+        patientName:
+          type: string
+          example: "{{$randomFirstName}}"
+      required:
+        - ExepnseReportId
+        - healtcareCenterId
+        - healtcareCenterName
+        - serviceDate
+        - charnge
+        - currency
+        - beneficiaryId
+        - patientName
+    expenseReport-new:
+      title: Expense report new
+      type: object
+      properties:
+        healtcareCenterId:
+          type: string
+          example: "{{$guid}}"
+        healtcareCenterName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        serviceDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        charnge:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        currency:
+          type: string
+          example: "{{$randomCurrencyCode}}"
+        beneficiaryId:
+          type: string
+          example: "{{$guid}}"
+        patientName:
+          type: string
+          example: "{{$randomFirstName}}"
+      required:
+        - healtcareCenterId
+        - healtcareCenterName
+        - serviceDate
+        - charnge
+        - currency
+        - beneficiaryId
+        - patientName
+      x-stoplight:
+        id: "{{$guid}}"
+    manualClaims:
+      title: Manual claims
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        claimId:
+          type: string
+          example: "{{$guid}}"
+        claimType:
+          type: string
+          example: "{{$randomLoremWords}}"
+        medicalCenterName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        patientName:
+          type: string
+          example: "{{$randomFirstName}}"
+        ServiceType:
+          type: string
+          example: "{{$randomLoremWords}}"
+        ClaimAmount:
+          type: string
+          example: "{{$randomPrice}}"
+        ClaimCurrency:
+          type: string
+          example: "{{$randomCurrencyCode}}"
+        ServiceDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        SubmissionDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        status:
+          type: string
+          example: "completed"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+        files:
+          type: array
+          items:
+            type: string
+            example: "{{$randomFileName}}"
+            format: binary
+      required:
+        - claimId
+        - claimType
+        - medicalCenterName
+        - patientName
+        - ServiceType
+        - ClaimAmount
+        - ClaimCurrency
+        - ServiceDate
+        - SubmissionDate
+        - status
+        - notes
+        - files
+    manualClaims-new:
+      title: Manual claims new
+      type: object
+      x-stoplight:
+        id: string
+      properties:
+        claimType:
+          type: string
+        medicalCenterName:
+          type: string
+        patientName:
+          type: string
+        ServiceType:
+          type: string
+        ClaimAmount:
+          type: string
+        ClaimCurrency:
+          type: string
+        ServiceDate:
+          type: string
+          format: date
+        SubmissionDate:
+          type: string
+          format: date
+        notes:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+        - claimType
+        - medicalCenterName
+        - patientName
+        - ServiceType
+        - ClaimAmount
+        - ClaimCurrency
+        - ServiceDate
+        - SubmissionDate
+        - notes
+        - files
+    medicalFile:
+      title: Medical file
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        medicalFileId:
+          type: string
+          example: "{{$guid}}"
+        Name:
+          type: string
+          example: "{{$randomFirstName}}"
+        birthDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        gender:
+          type: string
+          example: "male"
+        bloodType:
+          type: string
+          example: "flex"
+        height:
+          type: string
+          example: "{{$randomPrice}}"
+        allergies:
+          type: array
+          items:
+            $ref: '#/components/schemas/allergies'
+        chronicDiseases:
+          type: array
+          items:
+            $ref: '#/components/schemas/chronicDiseases'
+        surgeryHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/surgeryHistory'
+        clinicalVisits:
+          type: array
+          items:
+            $ref: '#/components/schemas/clinicalVisits'
+        medicalTests:
+          type: array
+          items:
+            $ref: '#/components/schemas/medicalTests'
+      required:
+        - Name
+        - birthDate
+        - gender
+    allergies:
+      title: Allergies
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        allergyName:
+          type: string
+          example: "{{$randomLoremWords}}"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - allergyName
+    chronicDiseases:
+      title: Chronic diseases
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        DiseaseName:
+          type: string
+          example: "{{$randomLoremWords}}"
+        diagnosisDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        diagnosedBy:
+          type: string
+          example: "{{$randomFirstName}}"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - DiseaseName
+    surgeryHistory:
+      title: Surgery history
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        SurgeryName:
+          type: string
+          example: "{{$randomFirstName}}"
+        SurgeryDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        doctorName:
+          type: string
+          example: "{{$randomFirstName}}"
+        medicalCenterName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - SurgeryName
+    medicalTests:
+      title: Medical tests
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        testName:
+          type: string
+          example: "{{$randomAdjective}}"
+        testDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        centerName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - testName
+        - testDate
+        - centerName
+    clinicalVisits:
+      title: Clinical visits
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        visitType:
+          type: string
+          example: "{{$randomAdjective}}"
+        visitDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+        centerName:
+          type: string
+          example: "{{$randomCompanyName}}"
+        doctorName:
+          type: string
+          example: "{{$randomFirstName}}"
+        notes:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - visitType
+        - visitDate
+        - centerName
+        - doctorName
+        - notes
+    institutions:
+      title: institutions
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        instituionId:
+          type: string
+          example: "{{$guid}}"
+        Name:
+          type: string
+          example: "{{$randomFirstName}}"
+        phoneNumber:
+          type: string
+          example: "{{$randomPhoneNumber}}"
+        cityHq:
+          type: string
+          example: "{{$randomCity}}"
+        employeeCount:
+          type: string
+          example: "{{$randomInt}}"
+        beneficiaryCount:
+          type: string
+          example: "{{$randomInt}}"
+        beneftiPolicy:
+          $ref: '#/components/schemas/insurancePolicy'
+      required:
+        - instituionId
+        - Name
+        - employeeCount
+        - beneficiaryCount
+        - beneftiPolicy
+    institutions-new:
+      title: institutions
+      type: object
+      x-stoplight:
+        id: string
+      properties:
+        Name:
+          type: string
+        phoneNumber:
+          type: string
+        cityHq:
+          type: string
+        beneftiPolicy:
+          $ref: '#/components/schemas/insurancePolicy-new'
+      required:
+        - Name
+        - beneftiPolicy
+    institutions-update:
+      title: institutions
+      type: object
+      x-stoplight:
+        id: "{{$guid}}"
+      properties:
+        Name:
+          type: string
+          example: "{{$randomFirstName}}"
+        phoneNumber:
+          type: string
+          example: "{{$randomPhoneNumber}}"
+        cityHq:
+          type: string
+          example: "{{$randomCity}}"
+        beneftiPolicy:
+          $ref: '#/components/schemas/insurancePolicy-update'
+    insurancePolicy:
+      title: Insurance policy
+      type: object
+      x-stoplight:
+        id: "{{$guid}}"
+      properties:
+        insurancePolicyId:
+          type: string
+          example: "{{$guid}}"
+        insuranceType:
+          type: string
+          example: "{{$randomLoremWords}}"
+        insuranceIssuer:
+          type: string
+          example: "{{$randomFirstName}}"
+        balanceResetDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        policyExpirationDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        inPatientAggregateLimit:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        inPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                example: "{{$randomLoremWords}}"
+              limit:
+                type: integer
+                example: {{$randomPrice}}
+                format: float
+            required:
+              - service
+              - limit
+        outPatientAggregateLimit:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        outPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                example: "{{$randomLoremWords}}"
+              limit:
+                type: string
+                example: "{{$randomPrice}}"
+            required:
+              - service
+              - limit
+      required:
+        - insurancePolicyId
+        - insuranceType
+        - insuranceIssuer
+        - balanceResetDate
+        - policyExpirationDate
+        - inPatientAggregateLimit
+        - inPatientServices
+        - outPatientAggregateLimit
+        - outPatientServices
+    insurancePolicy-new:
+      title: Insurance policy
+      type: object
+      x-stoplight:
+        id: string
+      properties:
+        InPatientAggregateLimit:
+          type: integer
+          format: float
+        inPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+              limit:
+                type: integer
+                format: float
+            required:
+              - service
+              - limit
+        outPatientAggregateLimit:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        outPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+              limit:
+                type: string
+            required:
+              - service
+              - limit
+      required:
+        - InPatientAggregateLimit
+        - inPatientServices
+        - outPatientAggregateLimit
+        - outPatientServices
+    insurancePolicy-update:
+      title: Insurance policy
+      type: object
+      x-stoplight:
+        id: "{{$guid}}"
+      properties:
+        benefitPolicyId:
+          type: string
+          example: "{{$guid}}"
+        iInPatientAggregateLimit:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        inPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                example: "{{$randomLoremWords}}"
+              limit:
+                type: integer
+                example: {{$randomPrice}}
+                format: float
+        outPatientAggregateLimit:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        outPatientServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+                example: "{{$randomLoremWords}}"
+              limit:
+                type: string
+                example: "{{$randomPrice}}"
+    medicalCenterClaims:
+      title: medicalCenterClaims
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      properties:
+        claimId:
+          type: string
+          example: "{{$guid}}"
+        patient:
+          $ref: '#/components/schemas/patient'
+        checkInConfermation:
+          type: string
+          example: "{{$randomWord}}"
+        Staff:
+          type: string
+          example: "{{$randomLoremWords}}"
+        serviceDate:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date
+        submittedOn:
+          type: string
+          example: "{{$isoTimestamp}}"
+          format: date-time
+        medicalServices:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                $ref: '#/components/schemas/medicalService'
+              expenseReviewStatus:
+                type: string
+                example: "done"
+              medicalReviewStatus:
+                type: string
+                example: "reviewed"
+              rejectedAmount:
+                type: integer
+                example: {{$randomPrice}}
+                format: float
+            required:
+              - service
+              - expenseReviewStatus
+              - medicalReviewStatus
+              - rejectedAmount
+        expenseReview:
+          type: string
+          example: "{{$randomLoremLines}}"
+        medicalReview:
+          type: string
+          example: "{{$randomLoremLines}}"
+      required:
+        - claimId
+        - patient
+        - checkInConfermation
+        - Staff
+        - serviceDate
+        - submittedOn
+        - medicalServices
+        - expenseReview
+        - medicalReview
+    medicalCenterClaims-update:
+      title: medicalCenterClaims update
+      type: object
+      x-stoplight:
+        id: "{{$guid}}"
+      properties:
+        medicalServices:
+          type: array
+          items:
+            type: object
+            properties:
+              expenseReviewStatus:
+                type: string
+                example: "done"
+              medicalReviewStatus:
+                type: string
+                example: "pending"
+              rejectedAmount:
+                type: integer
+                example: {{$randomPrice}}
+                format: float
+      required:
+        - medicalServices
+    medicalService:
+      title: Medical Services
+      x-stoplight:
+        id: "{{$guid}}"
+      type: object
+      x-examples: {}
+      properties:
+        serviceId:
+          type: string
+          example: "{{$guid}}"
+        serviceCode:
+          type: string
+          example: "{{$randomBankAccountBic}}"
+        serviceName:
+          type: string
+          example: "{{$randomLoremWords}}"
+        serviceType:
+          type: string
+          example: "{{$randomLoremWords}}"
+        amountCharged:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        amountAllowed:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+        percentageCovered:
+          type: integer
+          example: {{$randomPrice}}
+          format: float
+      required:
+        - serviceId
+        - serviceCode
+        - serviceName
+        - serviceType
+        - amountCharged
+        - amountAllowed
+        - percentageCovered
+  examples: {}
+  responses: {}
+  securitySchemes:
+    'Authorization: Basic ZGVtbzpwQDU1dzByZA==':
+      type: http
+      scheme: basic
+      description: ''
+  requestBodies: {}
+  parameters:
+    limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: 'A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 30'
+    starting_after_object:
+      name: starting_after_object
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 'A cursor for use in pagination. starting_after is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include starting_after=obj_foo in order to fetch the next page of the list.'
+    doctorId:
+      name: doctorId
+      in: query
+      required: false
+      schema:
+        type: string
+      description: doctor ID
+    medicalCenterId:
+      name: medicalCenterId
+      in: query
+      required: false
+      schema:
+        type: string
+      description: medical center ID
+    pending:
+      name: pending
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Flag to retrieve pending appointments. Default value is true
+    booked:
+      name: booked
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Flag to retrieve booked appointments. Default value is true
+    completed:
+      name: completed
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Flag to retrieve completed appointments. Default value is true
+    cancelled:
+      name: cancelled
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Flag to retrieve cancelled appointments. Default value is true
+    fromDate:
+      name: fromDate
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+      description: retrieve objects associated with a date on or after this date
+    toDate:
+      name: toDate
+      in: query
+      schema:
+        type: string
+        format: date
+      description: Retrieve objects associated with a date on or before this date
+    sortBy:
+      name: sortBy
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - doctor
+          - medicalCenter
+      description: 'Flag to sort the objects by either doctor, medical centers or objectId. Default will be to sort by object id'
+    rejected:
+      name: rejected
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: Flag to retrieve rejected appointments. Default value is true
+    specialty:
+      name: specialty
+      in: query
+      required: false
+      schema:
+        type: string
+      description: filter for doctor's specialty
+    institutionId:
+      name: institutionId
+      in: query
+      required: false
+      schema:
+        type: string
+      description: institution Id
+    city:
+      name: city
+      in: query
+      required: false
+      schema:
+        type: string
+      description: filter parameter to indicate city
+x-extension-2: null
